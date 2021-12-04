@@ -1,0 +1,11 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: https://api.consultproject.co.uk
+functions:
+  connect:
+    lang: node12-debian
+    handler: ./connect
+    image: registry.gitlab.com/kclhi/reflect/connect:latest
+    environment_file:
+      - env.yml  
