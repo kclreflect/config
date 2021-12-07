@@ -1,0 +1,14 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: https://services.reflectproject.co.uk
+functions:
+  notify:
+    lang: node12-debian
+    handler: ./notify
+    image: registry.gitlab.com/kclhi/reflect/notify:latest
+    environment:
+      NODE_EXTRA_CA_CERTS: /var/openfaas/secrets/tls.pem
+    secrets:
+      - ca-cert
+
