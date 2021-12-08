@@ -8,4 +8,4 @@ functions:
     handler: ./connect
     image: registry.gitlab.com/kclhi/reflect/connect:latest
     environment_file:
-      - env.yml  
+      - env.connect.yml  

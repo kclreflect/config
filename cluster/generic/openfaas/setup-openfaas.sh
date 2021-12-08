@@ -3,43 +3,43 @@ helm repo add openfaas https://openfaas.github.io/faas-netes/
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 # ---------------------------------------------- #
-echo "about to install openfaas..."
+echo "=> about to install openfaas..."
 sleep 5
 kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
-helm upgrade openfaas --install openfaas/openfaas --namespace openfaas --set functionNamespace=openfaas-fn --set generateBasicAuth=true
+helm upgrade openfaas --install openfaas/openfaas --namespace openfaas --set functionNamespace=openfaas-fn --set generateBasicAuth=true --set serviceType=None # attempt to remove external access via nodeport
 PASSWORD=$(kubectl -n openfaas get secret basic-auth -o jsonpath="{.data.basic-auth-password}" | base64 --decode) 
-echo "openFaaS admin password: $PASSWORD"
+echo "=> openFaaS admin password: $PASSWORD"
 # ---------------------------------------------- #
-echo "creating secret to store root ca certificate (to be loaded by functions)..."
-kubectl create secret generic ca-cert --from-file=tls.pem --namespace openfaas-fn
+echo "=> creating secret to store root ca certificate (to be loaded by functions)..."
+kubectl create secret generic service-ca-cert --from-literal=ca.crt="$(kubectl get secret $SERVICE_CA_SECRET --namespace cert-manager -o json | jq -r '.data."tls.crt"' | base64 -d)" --namespace openfaas-fn
 # ---------------------------------------------- #
-echo "about to install cert manager (may already be installed)..."
+echo "=> about to install cert manager (may already be installed)..."
 sleep 5
 helm install cert-manager --namespace cert-manager --create-namespace --set installCRDs=true --version v1.6 jetstack/cert-manager
 # ---------------------------------------------- #
-echo "about to create cluster issuer..."
+echo "=> about to create cluster issuer..."
 # kubectl create -f ./cert-manager/prod-issuer.yaml 
-sed -e 's|CERT_EMAIL|'"${CERT_EMAIL}"'|g' ./cert-manager/prod-issuer.yaml | kubectl create -f -
+sed -e 's|CERT_EMAIL|'"${CERT_EMAIL}"'|g' ./objects/prod-issuer.yaml | kubectl create -f -
 kubectl describe clusterissuer letsencrypt-prod -n cert-manager
 # ---------------------------------------------- #
-echo "about to install ingress resource..."
+echo "=> about to install ingress resource..."
 sleep 5
 # kubectl create -f ./cert-manager/ingress-tls-openfaas.yaml --namespace openfaas 
-sed -e 's|OPENFAAS_API_URL|'"${OPENFAAS_API_URL}"'|g' ./cert-manager/ingress-tls-openfaas.yaml | kubectl create -f - --namespace openfaas # create ingress resource for openfaas (which communicates with the controller; one controller many resources)
+sed -e 's|OPENFAAS_API_URL|'"${OPENFAAS_API_URL}"'|g' ./objects/ingress-tls-openfaas.yaml | kubectl create -f - --namespace openfaas # create ingress resource for openfaas (which communicates with the controller; one controller many resources)
 # ---------------------------------------------- #
-echo "waiting for certificates to generate (might take longer than this wait)..."
+echo "=> waiting for certificates to generate (might take longer than this wait)..."
 sleep 30
 kubectl get certificate --namespace openfaas
 sleep 3
 kubectl describe certificate api-tls --namespace openfaas 
 kubectl describe secret api-tls --namespace openfaas
 # ---------------------------------------------- #
-echo "setting up gitlab container registry keys..."
+echo "=> setting up gitlab container registry keys..."
 sleep 5
 kubectl create secret docker-registry gitlab-container-key --docker-server=$DOCKER_SERVER --docker-username=$DOCKER_USERNAME --docker-password=$DOCKER_PASSWORD --docker-email=$DOCKER_EMAIL --namespace openfaas-fn
 kubectl get secrets gitlab-container-key --namespace openfaas-fn
 kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "gitlab-container-key"}]}' -n openfaas-fn
-echo "WARN: login locally to Gitlab (in addition to the keys on Kubernetes being set), in order to push from faas-cli"
+echo "=> WARN: login locally to Gitlab (in addition to the keys on Kubernetes being set), in order to push from faas-cli"
 # ---------------------------------------------- #
-echo "logging in to openfaas API..."
+echo "=> logging in to openfaas API..."
 faas-cli login --gateway https://$OPENFAAS_API_URL --username admin --password $PASSWORD
