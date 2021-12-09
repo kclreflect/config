@@ -254,3 +254,5 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/git,node,data,images,dropbox,certificates,archlinuxpackages
+
+info.txt

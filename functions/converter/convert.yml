@@ -4,7 +4,7 @@ provider:
   gateway: https://services.reflectproject.co.uk
 functions:
   convert:
-    lang: node12-debian
+    lang: node16
     handler: ./convert
     image: registry.gitlab.com/kclhi/reflect/convert:latest
     annotations:

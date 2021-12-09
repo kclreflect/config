@@ -1,7 +1,8 @@
 'use strict'
-const got = require("got");
+
+const logger = require("./winston");
 const fs = require("fs").promises;
-const amqp = require("amqplib")
+const amqp = require("amqplib");
 
 module.exports = async (event, context) => {
   let opts, connection;
@@ -12,9 +13,10 @@ module.exports = async (event, context) => {
       ca: [await fs.readFile(process.env.ca_path)]
     }
   } catch(error) {
-    console.log("error reading tls information: "+error);
+    logger.error("error reading tls information: "+error);
   }
   try {
+    logger.debug("opening connection to queue")
     connection = await amqp.connect("amqps://"+process.env.queue_username+":"+process.env.queue_password+"@"+process.env.queue_host, opts);
     let channel = await connection.createChannel();
     await channel.assertExchange(process.env.exchange_name, 'direct', {durable: false });
@@ -22,9 +24,8 @@ module.exports = async (event, context) => {
     await channel.close();
     await connection.close();
   } catch(error) {
-    console.log("error sending information to queue: "+error);
+    logger.error("error sending information to queue: "+error);
     if(connection) connection.close();
   }
   return context.status(200).succeed();
 }
-
