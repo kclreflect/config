@@ -16,7 +16,7 @@ echo "=> making queue's CA cert available to functions..."
 kubectl create secret generic queue-cert --from-literal=queue.pem="$(kubectl get secret $QUEUE_SECRET --namespace $QUEUE_NAMESPACE -o json | jq -r '.data."ca.crt"' | base64 -d)" --namespace openfaas-fn
 # ---------------------------------------------- #
 echo "=> creating client certificate (signed by service CA) to allow queue clients (functions) to authenticate themselves with the server..."
-sed -e 's|QUEUE_CLIENT_SECRET|'"${QUEUE_CLIENT_SECRET}"'|g' ./objects/certificates/queue-client-cert.yaml | kubectl create -f -
+sed -e 's|QUEUE_CLIENT_SECRET|'"${QUEUE_CLIENT_SECRET}"'|g' ./objects/certificates/queue-client-cert.yaml | kubectl create -f - --namespace openfaas-fn
 sleep 5
 kubectl get certificate --namespace openfaas-fn
 sleep 3
@@ -30,5 +30,6 @@ echo "=> creating queue cluster..."
 sed -e 's|QUEUE_CLUSTER_NAME|'"${QUEUE_CLUSTER_NAME}"'|g' ./objects/rabbitmq.yaml | sed -e 's|QUEUE_NAMESPACE|'"${QUEUE_NAMESPACE}"'|g' - | sed -e 's|QUEUE_SECRET|'"${QUEUE_SECRET}"'|g' - | kubectl create -f -
 echo "=> waiting for queue to set up before probing for credentials..."
 sleep 30
-echo "username: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.username}' -n ${QUEUE_NAMESPACE} | base64 --decode)
-echo "password: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.password}' -n ${QUEUE_NAMESPACE} | base64 --decode)
+echo "username: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.username}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
+echo "password: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.password}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
+kubectl port-forward "service/${QUEUE_CLUSTER_NAME}" 15671 --namespace ${QUEUE_NAMESPACE}

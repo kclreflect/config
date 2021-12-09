@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-connector-configmap
+data:
+  OPEN_FAAS_GW_URL: "http://gateway.openfaas.svc.cluster.local:8080"
+  RMQ_TOPICS: "sensor"
+  RMQ_HOST: "rabbit.warren.svc.cluster.local"
+  RMQ_PORT: "5671"
+  RMQ_USER: "default_user_wYzNhGPRRykdK9OWbPj"
+  RMQ_PASS: "ScSoGFyJeVFp_59ImTcbXqFEkiSYN7rG"  
+  REQ_TIMEOUT: "30s"
+  TOPIC_MAP_REFRESH_TIME: "30s"

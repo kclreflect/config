@@ -1,0 +1,11 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: https://services.reflectproject.co.uk
+functions:
+  convert:
+    lang: node12-debian
+    handler: ./convert
+    image: registry.gitlab.com/kclhi/reflect/convert:latest
+    annotations:
+      topic: sensor
