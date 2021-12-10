@@ -29,3 +29,6 @@ echo "=> running cluster updates..."
 kops update cluster --yes --state s3://$STATE_BUCKET_NAME
 kops rolling-update cluster --yes --state s3://$STATE_BUCKET_NAME
 rm cluster-desired-config.yaml
+# ---------------------------------------------- #
+echo "=> pods and nodes for reference:"
+kubectl get pod -o wide -A

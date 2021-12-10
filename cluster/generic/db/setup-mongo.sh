@@ -6,8 +6,14 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 # ---------------------------------------------- #
 echo "=> installing mongodb..."
-helm install $DB_NAMESPACE --set auth.rootPassword=$ROOT_PASSWORD,auth.usernames[0]=u$USER,auth.passwords[0]=$PASSWORD,auth.databases[0]=$DB_NAME,architecture=replicaset,replicaCount=2 --namespace $DB_NAMESPACE --create-namespace bitnami/mongodb 
+helm install $DB_NAME --set auth.rootPassword=$ROOT_PASSWORD,\
+auth.usernames[0]=u$USER,\
+auth.passwords[0]=$PASSWORD,\
+auth.databases[0]=$DB_NAME,\
+architecture=replicaset,\
+replicaCount=2 \
+--namespace $DB_NAMESPACE --create-namespace bitnami/mongodb
 echo "=> user: u"$USER;
 echo "=> password: "$PASSWORD;
 echo "=> root password: "$ROOT_PASSWORD
-echo "=> retain these details for use by functions"
+echo "=> to retrieve: kubectl get secret ${DB_NAME}-mongodb -n ${DB_NAMESPACE} -o json | jq -r '.data | with_entries(.value |= @base64d)'"
