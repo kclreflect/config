@@ -15,7 +15,7 @@
 *.sig
 
 pkg/
-src/
+build/
 
 ### certificates ###
 *.pem
