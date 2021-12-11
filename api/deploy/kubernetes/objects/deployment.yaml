@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: registry.gitlab.com/kclhi/reflect/api:latest
+        env:
+          - name: DB_STRING
+            value: DB_STRING_VALUE
+          - name: DB_USER
+            value: DB_USER_VALUE
+          - name: DB_PASS_PATH
+            value: "/var/credentials/DB_PASS_SECRET/password"
+          - name: ROOT_CERT_PATH
+            value: "/var/tls/DB_SECRET/ca.crt"
+        volumeMounts:
+          - name: DB_SECRET 
+            mountPath: "/var/tls/DB_SECRET"
+            readOnly: true
+          - name: DB_PASS_SECRET 
+            mountPath: "/var/credentials/DB_PASS_SECRET"
+            readOnly: true
+        ports:
+        - containerPort: 3000
+      volumes:
+        - name: DB_SECRET 
+          secret:
+            secretName: DB_SECRET 
+        - name: DB_PASS_SECRET 
+          secret:
+            secretName: DB_PASS_SECRET 
