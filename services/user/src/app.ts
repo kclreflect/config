@@ -20,22 +20,9 @@ export default async() => {
   const app = fastify({logger: true});
 
   // env variables
-  await app.register(fastifyEnv, {dotenv: true, schema: {
-      type: 'object',
-      properties: {
-        PORT: {type:'string', default:3000},
-        COOKIE_SECRET: {type:'string', default:'secret'},
-        DB_STRING: {type:'string'},
-        DB_USER: {type:'string'},
-        DB_PASS: {type:'string'},
-        DB_PASS_PATH: {type:'string'},
-        ROOT_CERT_PATH: {type:'string'},
-        USER: {type:'string'},
-        PASSWORD: {type:'string'}
-      }
-    }
-  });
+  await app.register(fastifyEnv, {dotenv: true, schema: {type: 'object', properties: { PORT: {type:'string', default:3000}, COOKIE_SECRET: {type:'string', default:'secret'}, DB_STRING: {type:'string'}, DB_USER: {type:'string'}, DB_PASS: {type:'string'}, DB_PASS_PATH: {type:'string'}, ROOT_CERT_PATH: {type:'string'}, USER: {type:'string'}, PASSWORD: {type:'string'}}}});
 
+  // db
   try { 
     if(mongoose.connection.readyState==0) await mongoose.connect('mongodb://'+app.config.DB_STRING, {
       user:app.config.DB_USER, 
@@ -60,15 +47,6 @@ export default async() => {
   // routes
   app.register(callbackRoute);
   app.register(idRoute);
-
-  app.setErrorHandler(function (err, req, reply) {
-    if (err.statusCode === 401) {
-      // this was unauthorized! Display the correct page/message.
-      reply.code(401).send({ was: 'unauthorized' })
-      return
-    }
-    reply.send(err)
-  });
   
   return app;
 

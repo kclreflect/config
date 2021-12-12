@@ -3,7 +3,7 @@ export $(cat .env | xargs)
 echo "=> installing queue cluster operator (manages cluster creation)..."
 kubectl apply -f "https://github.com/rabbitmq/cluster-operator/releases/latest/download/cluster-operator.yml"
 # ---------------------------------------------- #
-echo "=> generating certificate and key for queue server tls..."
+echo "=> generating certificate and key for queue server tls (signed by service CA)..."
 kubectl create namespace $QUEUE_NAMESPACE
 sed -e 's|QUEUE_NAMESPACE|'"${QUEUE_NAMESPACE}"'|g' ./objects/certificates/queue-cert.yaml | sed -e 's|QUEUE_CLUSTER_NAME|'"${QUEUE_CLUSTER_NAME}"'|g' - | sed -e 's|QUEUE_SECRET|'"${QUEUE_SECRET}"'|g' - | kubectl create -f - --namespace $QUEUE_NAMESPACE
 sleep 5

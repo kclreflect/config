@@ -1,23 +1,23 @@
 apiVersion: networking.k8s.io/v1 
 kind: Ingress
 metadata:
-  name: api
+  name: user
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - API_URL
-    secretName: API_SECRET
+    - USER_URL
+    secretName: USER_SECRET
   rules:
-  - host: API_URL
+  - host: USER_URL
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: api
+            name: user
             port:
               number: 3000

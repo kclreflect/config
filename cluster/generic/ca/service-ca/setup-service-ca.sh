@@ -10,6 +10,7 @@ rm service-ca-tls.key
 rm service-ca-tls.pem
 openssl genrsa -out service-ca-tls.key 4096
 openssl req -x509 -new -nodes -subj "${CA_SUBJECT_STRING}" -key service-ca-tls.key -sha256 -days 1825 -out service-ca-tls.pem
+sleep 3
 # ---------------------------------------------- #
 echo "=> creating secret to store these credentials..."
 kubectl create secret tls $SERVICE_CA_SECRET --key="service-ca-tls.key" --cert="service-ca-tls.pem" --namespace cert-manager

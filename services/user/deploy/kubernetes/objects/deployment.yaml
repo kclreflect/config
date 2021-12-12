@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: user
   labels:
-    app: api
+    app: user
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api
+      app: user
   template:
     metadata:
       labels:
-        app: api
+        app: user
     spec:
       containers:
-      - name: api
-        image: registry.gitlab.com/kclhi/reflect/api:latest
+      - name: user
+        image: registry.gitlab.com/kclhi/reflect/user:latest
         envFrom:
           - secretRef:
               name: ENV_SECRET
