@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-deployment
+  name: api
   labels:
     app: api
 spec:
@@ -17,15 +17,9 @@ spec:
       containers:
       - name: api
         image: registry.gitlab.com/kclhi/reflect/api:latest
-        env:
-          - name: DB_STRING
-            value: DB_STRING_VALUE
-          - name: DB_USER
-            value: DB_USER_VALUE
-          - name: DB_PASS_PATH
-            value: "/var/credentials/DB_PASS_SECRET/password"
-          - name: ROOT_CERT_PATH
-            value: "/var/tls/DB_SECRET/ca.crt"
+        envFrom:
+          - secretRef:
+              name: ENV_SECRET
         volumeMounts:
           - name: DB_SECRET 
             mountPath: "/var/tls/DB_SECRET"

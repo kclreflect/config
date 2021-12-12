@@ -27,4 +27,13 @@ describe('user', () => {
     expect(await NokiaModel.find({'_id':'00ABC'})).to.have.lengthOf(1);
   }).timeout(0);
 
+  it('can retrieve submitted user information', async() => {
+    const app = await build();
+    const addUser = await app.inject({method:'GET', url:'/callback?userid=00DEF&code=XYZ'});
+    expect(addUser.statusCode).to.equal(200);
+    const getUser = await app.inject({method:'POST', url:'/id', payload:{"nokiaId":"00DEF"}});
+    expect(getUser.statusCode).to.equal(200);
+    expect(getUser.body).to.equal('{"patientId":"00ABC"}');
+  }).timeout(0);
+
 });
