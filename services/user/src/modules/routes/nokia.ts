@@ -1,8 +1,7 @@
-import mongoose from 'mongoose';
 import logger from '../../winston'
 import { FastifyInstance } from 'fastify';
 import { Callback, CallbackType, NokiaId, NokiaIdType, PatientId, PatientIdType } from '../../types/nokia';
-import { Nokia, NokiaModel } from '../db/models/nokia'
+import { NokiaDocument } from '../db/models/nokia';
 
 export default async(server:FastifyInstance) => {
 
@@ -13,7 +12,10 @@ export default async(server:FastifyInstance) => {
     handler: async(req, rep) => {
       const callback = req.query;
       try { 
-        if(mongoose.connection.readyState==1&&req.cookies&&Object.keys(req.cookies).includes('bar')&&req.unsignCookie(req.cookies['bar']).valid) await NokiaModel.updateOne({'_id':req.unsignCookie(req.cookies['bar']).value||undefined}, {'nokiaId':callback.userid}, {upsert:true}); 
+        if(req.cookies&&Object.keys(req.cookies).includes('bar')&&req.unsignCookie(req.cookies['bar']).valid) {
+          const { Nokia } = server.db.models;
+          await Nokia.updateOne({'_id':req.unsignCookie(req.cookies['bar']).value||undefined}, {'nokiaId':callback.userid}, {upsert:true}); 
+        }
       } catch(error) { 
         logger.error('error updating nokia credentials: '+error); 
       }
@@ -27,9 +29,10 @@ export default async(server:FastifyInstance) => {
     schema: {body:NokiaId, response:{200:PatientId}},
     handler: async(req, rep) => {
       const {body:nokia} = req;
-      let users:Array<Nokia> = [];
+      const { Nokia } = server.db.models;
+      let users:Array<NokiaDocument> = [];
       try { 
-        users = await NokiaModel.find({'_id':{$ne:undefined}, 'nokiaId':nokia.nokiaId});
+        users = await Nokia.find({'_id':{$ne:undefined}, 'nokiaId':nokia.nokiaId});
       } catch(error) { 
         logger.error('error updating withings credentials: '+error); 
       }
