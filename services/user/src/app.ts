@@ -1,13 +1,16 @@
 import fastify from 'fastify'
-import { FastifyCookieOptions } from 'fastify-cookie'
+import {FastifyCookieOptions} from 'fastify-cookie'
 import fastifyBasicAuth, { FastifyBasicAuthOptions } from 'fastify-basic-auth';
+import fastifyPointOfView from 'point-of-view';
 import fastifyEnv from 'fastify-env'
 import cookie from 'fastify-cookie'
-import logger from './winston'
-import { callbackRoute } from './modules/routes/nokia/callback'
-import { idRoute } from './modules/routes/nokia/id'
+import fastifyStatic from 'fastify-static';
 import mongoose from 'mongoose';
+import pug from 'pug';
+import {join} from 'path';
+import logger from './winston'
 import { promises as fs } from 'fs';
+import nokia from './modules/routes/nokia'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -40,13 +43,26 @@ export default async() => {
   const authenticate = {realm:'reflect'}
   const validate = async(username:string, password:string) => { if(username!==app.config.USER||password!==app.config.PASSWORD) return new Error('access denied');}
   app.register(fastifyBasicAuth, {authenticate, validate} as FastifyBasicAuthOptions);
+
+  app.addHook('onRequest', process.env.NODE_ENV&&process.env.NODE_ENV=="test"?(_req:any, _rep:any, done:any)=>{done()}:app.basicAuth);
+
+  app.setErrorHandler((err, _req, rep) => {
+    if(err.statusCode===401) {
+      rep.code(401).send('unauthorized');
+      return;
+    }
+    rep.send(err);
+  });
  
   // cookies
-  app.register(cookie, {secret: app.config.COOKIE_SECRET} as FastifyCookieOptions);
+  app.register(cookie, {secret:app.config.COOKIE_SECRET} as FastifyCookieOptions);
+
+  // views
+  app.register(fastifyStatic, {root:join(__dirname, 'public'), prefix:'/assets/'});
+  app.register(fastifyPointOfView, {engine:{pug:pug}, root:join(__dirname, 'views'),});
 
   // routes
-  app.register(callbackRoute);
-  app.register(idRoute);
+  app.register(nokia, {prefix:'/nokia'});
   
   return app;
 
