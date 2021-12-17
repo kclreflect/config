@@ -18,7 +18,7 @@ kubectl describe certificate queue-client --namespace openfaas
 kubectl describe secret $QUEUE_CLIENT_SECRET --namespace openfaas
 # ---------------------------------------------- #
 echo "=> creating configmaps..."
-kubectl create -f ./objects/rabbitmq-connector-configmap.yaml --namespace openfaas
+sed -e 's|QUEUE_TOPICS|'"${QUEUE_TOPICS}"'|g' ./objects/rabbitmq-connector-configmap.yaml | sed -e 's|QUEUE_USER|'"${QUEUE_USER}"'|g' - | sed -e 's|QUEUE_PASS|'"${QUEUE_PASS}"'|g' - | sed -e 's|QUEUE_CLUSTER_NAME|'"${QUEUE_CLUSTER_NAME}"'|g' - | sed -e 's|QUEUE_NAMESPACE|'"${QUEUE_NAMESPACE}"'|g' - | kubectl create -f - --namespace openfaas
 kubectl create configmap topology --from-file ./objects/topology.yaml --namespace openfaas
 # ---------------------------------------------- #
 echo "=> deploying queue connector..."

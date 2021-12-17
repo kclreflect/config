@@ -25,6 +25,7 @@ kubectl describe secret $QUEUE_CLIENT_SECRET --namespace openfaas-fn
 # ---------------------------------------------- #
 echo "=> making service CA (root) cert available to rabbit cluster to use in client authentication..."
 kubectl create secret generic service-ca-cert --from-literal=ca.crt="$(kubectl get secret $SERVICE_CA_SECRET --namespace cert-manager -o json | jq -r '.data."tls.crt"' | base64 -d)" --namespace ${QUEUE_NAMESPACE}
+sleep 3
 # ---------------------------------------------- #
 echo "=> creating queue cluster..."
 sed -e 's|QUEUE_CLUSTER_NAME|'"${QUEUE_CLUSTER_NAME}"'|g' ./objects/rabbitmq.yaml | sed -e 's|QUEUE_NAMESPACE|'"${QUEUE_NAMESPACE}"'|g' - | sed -e 's|QUEUE_SECRET|'"${QUEUE_SECRET}"'|g' - | kubectl create -f -
