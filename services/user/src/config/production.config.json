@@ -1,0 +1,7 @@
+{
+  "NOKIA": {
+    "AUTHORISATION_URL":"https://account.withings.com/oauth2_user/authorize2",
+    "TOKEN_URL":"https://account.withings.com/oauth2/token",
+    "CALLBACK_BASE_URL":"https://demo.reflectproject.co.uk"
+  }
+}

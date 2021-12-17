@@ -10,10 +10,27 @@ import {join} from 'path';
 import nokia from './modules/routes/nokia'
 import connect from './modules/db/index';
 import { Db } from './modules/db/index';
+import Config from './config/config';
 
 declare module 'fastify' {
   interface FastifyInstance {
-    config: {PORT:string, COOKIE_SECRET:string, DB_STRING:string, DB_USER:string, DB_PASS:string, DB_PASS_PATH:string, ROOT_CERT_PATH:string, USER:string, PASSWORD:string},
+    config: {
+      PORT:string, 
+      COOKIE_SECRET:string, 
+      PATIENT_ID_COOKIE:string,
+      DB_STRING:string, 
+      DB_USER:string, 
+      DB_PASS:string, 
+      DB_PASS_PATH:string, 
+      ROOT_CERT_PATH:string, 
+      USER:string, 
+      PASSWORD:string, 
+      NOKIA_CLIENT_ID:string,
+      NOKIA_CONSUMER_SECRET:string,
+      NOKIA_AUTHORISATION_URL:string, 
+      NOKIA_CALLBACK_BASE_URL:string, 
+      NOKIA_TOKEN_URL:string
+    },
     db:Db;
   }
 }
@@ -22,15 +39,34 @@ export default async() => {
   
   const app = fastify({logger:true});
 
+  // config
+  let config:Config = process.env.NODE_ENV=="production"?require('./config/production.config.json'):require('./config/development.config.json');
+
   // env
-  await app.register(fastifyEnv, {dotenv: true, schema: {type: 'object', properties: { PORT: {type:'string', default:3000}, COOKIE_SECRET: {type:'string', default:'secret'}, DB_STRING: {type:'string'}, DB_USER: {type:'string'}, DB_PASS: {type:'string'}, DB_PASS_PATH: {type:'string'}, ROOT_CERT_PATH: {type:'string'}, USER: {type:'string'}, PASSWORD: {type:'string'}}}});
+  await app.register(fastifyEnv, {dotenv:true, schema:{type:'object', properties:{
+    PORT:{type:'string', default:3000}, 
+    COOKIE_SECRET:{type:'string', default:'secret'}, 
+    PATIENT_ID_COOKIE:{type:'string'},
+    DB_STRING:{type:'string', default:''},
+    DB_USER:{type:'string', default:''}, 
+    DB_PASS:{type:'string', default:''},
+    DB_PASS_PATH:{type:'string', default:''},
+    ROOT_CERT_PATH: {type:'string', default:''},
+    USER:{type:'string', default:'user'},
+    PASSWORD:{type:'string', default:'pass'},
+    NOKIA_CLIENT_ID:{type:'string', default:''},
+    NOKIA_CONSUMER_SECRET:{type:'string', default:''},
+    NOKIA_AUTHORISATION_URL:{type:'string', default:config.NOKIA.AUTHORISATION_URL},
+    NOKIA_CALLBACK_BASE_URL:{type:'string', default:config.NOKIA.CALLBACK_BASE_URL},
+    NOKIA_TOKEN_URL:{type:'string', default:config.NOKIA.TOKEN_URL}
+  }}});
 
   // db
   await app.register(connect, {URL:app.config.DB_STRING, DB_USER:app.config.DB_USER, DB_PASS:app.config.DB_PASS, DB_PASS_PATH:app.config.DB_PASS_PATH, ROOT_CERT_PATH:app.config.ROOT_CERT_PATH});
 
   // auth
   const authenticate = {realm:'reflect'}
-  const validate = async(username:string, password:string) => { if(username!==app.config.USER||password!==app.config.PASSWORD) return new Error('access denied');}
+  const validate = async(username:string, password:string) => { if(username!==app.config.USER||password!==app.config.PASSWORD) { return new Error('access denied'); } else { return undefined; }};
   await app.register(fastifyBasicAuth, {authenticate, validate} as FastifyBasicAuthOptions);
 
   app.addHook('onRequest', process.env.NODE_ENV&&process.env.NODE_ENV=="test"?(_req:any, _rep:any, done:any)=>{done()}:app.basicAuth);

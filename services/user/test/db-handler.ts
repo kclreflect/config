@@ -14,7 +14,7 @@ export default class dbHandler {
   async connect() {
     if(!this.server) this.server = await MongoMemoryServer.create();
     const uri = this.server.getUri();
-    await mongoose.connect(uri, { dbName: 'verifyMASTER' });
+    await mongoose.connect(uri, {dbName:'reflectTest'});
   }
 
   async closeDatabase() {

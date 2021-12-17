@@ -4,7 +4,10 @@ module.exports = function (grunt) {
     watch:{
       js:{files:'src/public/js/*.js', tasks:['uglify']}, 
       views:{files:'src/views/*.pug', tasks:['copy']}},
-    copy:{main:{expand:true, flatten:true, src:'src/views/*', dest:'build/views/', filter:'isFile'}}
+    copy:{
+      views:{expand:true, flatten:true, src:'src/views/*', dest:'build/views/', filter:'isFile'},
+      config:{expand: true, cwd:'src', src:['**/*.json'], dest:'build/', filter:'isFile'}
+    }
   });
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');

@@ -1,7 +1,9 @@
 {
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "outDir": "./build",
+    "outDir":"./build",
+    "noImplicitReturns":true,
+    "noImplicitAny":true
   },
   "include": ["./src/**/*"],
   "exclude": [
