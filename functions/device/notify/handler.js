@@ -4,7 +4,7 @@ const logger = require("./winston");
 const fs = require("fs").promises;
 const amqp = require("amqplib");
 
-module.exports = async (event, context) => {
+module.exports = async(event, context) => {
   let opts, connection;
   try {
     opts = {

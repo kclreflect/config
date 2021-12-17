@@ -8,5 +8,12 @@
   },
   "keywords": [],
   "author": "Martin Chapman",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^9.1.3"
+  }
 }
