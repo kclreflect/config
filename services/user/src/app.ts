@@ -7,9 +7,12 @@ import cookie from 'fastify-cookie'
 import fastifyStatic from 'fastify-static';
 import pug from 'pug';
 import {join} from 'path';
+import merge from 'lodash.merge';
+import logger from 'winston';
+
 import nokia from './modules/routes/nokia'
 import connect from './modules/db/index';
-import { Db } from './modules/db/index';
+import {Db} from './modules/db/index';
 import Config from './config/config';
 
 declare module 'fastify' {
@@ -29,7 +32,9 @@ declare module 'fastify' {
       NOKIA_CONSUMER_SECRET:string,
       NOKIA_AUTHORISATION_URL:string, 
       NOKIA_CALLBACK_BASE_URL:string, 
-      NOKIA_TOKEN_URL:string
+      NOKIA_TOKEN_URL:string,
+      NOKIA_SUBSCRIPTION_URL:string,
+      API_URL:string
     },
     db:Db;
   }
@@ -40,7 +45,7 @@ export default async() => {
   const app = fastify({logger:true});
 
   // config
-  let config:Config = process.env.NODE_ENV=="production"?require('./config/production.config.json'):require('./config/development.config.json');
+  let config:Config = process.env.NODE_ENV=="production"?merge(require('./config/config.json'), require('./config/production.config.json')):merge(require('./config/config.json'), require('./config/development.config.json'));
 
   // env
   await app.register(fastifyEnv, {dotenv:true, schema:{type:'object', properties:{
@@ -58,7 +63,9 @@ export default async() => {
     NOKIA_CONSUMER_SECRET:{type:'string', default:''},
     NOKIA_AUTHORISATION_URL:{type:'string', default:config.NOKIA.AUTHORISATION_URL},
     NOKIA_CALLBACK_BASE_URL:{type:'string', default:config.NOKIA.CALLBACK_BASE_URL},
-    NOKIA_TOKEN_URL:{type:'string', default:config.NOKIA.TOKEN_URL}
+    NOKIA_TOKEN_URL:{type:'string', default:config.NOKIA.TOKEN_URL},
+    NOKIA_SUBSCRIPTION_URL:{type:'string', default:config.NOKIA.SUBSCRIPTION_URL},
+    API_URL:{type:'string'}
   }}});
 
   // db

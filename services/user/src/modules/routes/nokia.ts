@@ -1,7 +1,7 @@
 import logger from '../../winston';
 import { FastifyInstance } from 'fastify';
 import * as crypto from 'crypto';
-import { Callback, CallbackType, NokiaId, NokiaIdType, PatientId, PatientIdType } from '../types/nokia'
+import { Callback, CallbackType, NokiaId, NokiaIdType, PatientId, PatientIdType, TokenResponseBody } from '../types/nokia'
 import { NokiaDocument } from '../db/models/nokia';
 import Nokia from '../lib/nokia';
 
@@ -19,7 +19,7 @@ export default async(server:FastifyInstance) => {
     handler: async(req, rep) => {
       logger.debug('cookies recieved: '+JSON.stringify(req.cookies));
       if(req.cookies&&Object.keys(req.cookies).includes(server.config.PATIENT_ID_COOKIE)&&req.unsignCookie(req.cookies[server.config.PATIENT_ID_COOKIE]).valid) {
-        let access = await Nokia.getAccessToken(server.config.NOKIA_TOKEN_URL, server.config.NOKIA_CLIENT_ID, server.config.NOKIA_CONSUMER_SECRET, server.config.NOKIA_CALLBACK_BASE_URL, req.query.code);
+        let access:TokenResponseBody|undefined = await Nokia.getAccessToken(server.config.NOKIA_TOKEN_URL, server.config.NOKIA_CLIENT_ID, server.config.NOKIA_CONSUMER_SECRET, server.config.NOKIA_CALLBACK_BASE_URL, req.query.code);
         if(access) {
           logger.debug('received info for user. updating db...');
           try {
@@ -28,6 +28,12 @@ export default async(server:FastifyInstance) => {
             logger.debug('db updated.');
           } catch(error) { 
             logger.error('error updating nokia credentials: '+error); 
+          }
+          try {
+            let subscribed:boolean = await Nokia.subscribeToNotifications(server.config.NOKIA_SUBSCRIPTION_URL, access.access_token, access.userid, server.config.API_URL);
+            logger.debug(subscribed?"subscribed to notifications":"unable to subscribe to notifications");
+          } catch(error) {
+            logger.error('error subscribing to notification:'+error);
           }
         } 
       }

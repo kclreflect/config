@@ -9,3 +9,4 @@ export const PatientId = Type.Object({patientId:Type.String()});
 export type PatientIdType = Static<typeof PatientId>;
 
 export interface TokenResponseBody { access_token:string, expires_in:number, token_type:string, scope:string, refresh_token:string, userid:string };
+export interface NotificationSubscription { action:string, user_id:string, callbackurl:string, comment:string, appli:number }

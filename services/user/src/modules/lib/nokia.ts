@@ -1,5 +1,5 @@
 import got, { Response } from 'got';
-import { TokenResponseBody } from '../types/nokia'
+import { TokenResponseBody, NotificationSubscription } from '../types/nokia'
 import logger from '../../winston';
 
 export default class Nokia {
@@ -20,6 +20,30 @@ export default class Nokia {
       logger.error('error getting access token: '+error);
     }
     return undefined;
+  }
+
+  static genQueryString(params:any):string {
+		let query_string:string="";
+		for(let param in params) {
+      if(['action', 'user_id', 'callbackurl', 'comment', 'appli', 'start', 'end', 'type', 'userid', 'date'].filter((nonOauthParam)=>param.includes(nonOauthParam)).length) query_string+=param+"="+params[param]+"&";
+      else query_string+="oauth_"+param+"="+params[param]+"&";
+		}
+		return query_string.substring(0, query_string.length-1);
+	}
+
+  static async subscribeToNotifications(subscriptionUrl:string, token:string, userId:string, notifyBaseUrl:string):Promise<boolean> {
+    let subscriptionParams:NotificationSubscription = {action:'subscribe', user_id:userId, callbackurl:encodeURIComponent(notifyBaseUrl+'/function/notify'), comment:'comment', appli:4};
+    try {
+      let fullSubscriptionUrl:string = subscriptionUrl+"?access_token="+token+"&"+this.genQueryString(subscriptionParams);
+      logger.debug('subscription url: '+fullSubscriptionUrl);
+      let subscribe:Response = await got.get(fullSubscriptionUrl);
+      logger.debug('status from subscribe: '+subscribe.statusCode);
+      if(subscribe.statusCode!=200) throw new Error('unable to subscribe to notifications '+subscribe.statusCode+' '+subscribe.body);
+    } catch(error) {
+      logger.error('error setting up subscription: '+error);
+      return false;
+    }
+    return true;
   }
 
 }
