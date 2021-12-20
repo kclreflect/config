@@ -4,7 +4,7 @@ metadata:
   name: fhir
   annotations:
     # add an annotation indicating the issuer to use.
-    cert-manager.io/cluster-issuer: "ca-issuer"
+    cert-manager.io/cluster-issuer: "service-ca-issuer"
 spec:
   ingressClassName: nginx
   tls:

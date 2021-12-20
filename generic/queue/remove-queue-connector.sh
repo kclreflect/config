@@ -18,5 +18,5 @@ echo "=> deleting gitlab container registry keys..."
 kubectl delete secret gitlab-container-key --namespace openfaas
 # ---------------------------------------------- #
 echo "=> check removal of connector (and wait if still terminating):"
-kubectl get pods -A
+kubectl get pods --namespace openfaas
 

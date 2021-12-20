@@ -24,4 +24,4 @@ kubectl create configmap topology --from-file ./objects/topology.yaml --namespac
 echo "=> deploying queue connector..."
 kubectl apply -f ./objects/rabbitmq-connector.yaml
 sleep 5
-kubectl get pods -A
+kubectl get pods --namespace openfaas

@@ -31,6 +31,7 @@ echo "=> creating queue cluster..."
 sed -e 's|QUEUE_CLUSTER_NAME|'"${QUEUE_CLUSTER_NAME}"'|g' ./objects/rabbitmq.yaml | sed -e 's|QUEUE_NAMESPACE|'"${QUEUE_NAMESPACE}"'|g' - | sed -e 's|QUEUE_SECRET|'"${QUEUE_SECRET}"'|g' - | kubectl create -f -
 echo "=> waiting for queue to set up before probing for credentials..."
 sleep 30
-echo "username: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.username}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
-echo "password: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.password}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
-kubectl port-forward "service/${QUEUE_CLUSTER_NAME}" 15671 --namespace ${QUEUE_NAMESPACE}
+echo "=> username: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.username}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
+echo "=> password: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.password}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
+echo "=> connect with: 'kubectl port-forward "service/${QUEUE_CLUSTER_NAME}" 15671 --namespace ${QUEUE_NAMESPACE}'"
+echo "=> WARN: setup credentials if using queue connector"

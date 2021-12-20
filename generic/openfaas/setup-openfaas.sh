@@ -10,7 +10,7 @@ PASSWORD=$(kubectl -n openfaas get secret basic-auth -o jsonpath="{.data.basic-a
 echo "=> openFaaS admin password: $PASSWORD"
 # ---------------------------------------------- #
 echo "=> creating secret to store root ca certificate (to be loaded by functions)..."
-kubectl create secret generic service-ca-cert --from-literal=ca.crt="$(kubectl get secret $SERVICE_CA_SECRET --namespace cert-manager -o json | jq -r '.data."tls.crt"' | base64 -d)" --namespace openfaas-fn
+kubectl create secret generic service-ca-cert --from-literal=service-ca.crt="$(kubectl get secret $SERVICE_CA_SECRET --namespace cert-manager -o json | jq -r '.data."tls.crt"' | base64 -d)" --namespace openfaas-fn
 # ---------------------------------------------- #
 echo "=> about to install ingress resource..."
 sleep 5

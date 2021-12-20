@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: connector
-        image: registry.gitlab.com/kclhi/reflect/rabbitmq-connector:latest
+        image: registry.gitlab.com/kclreflect/rabbitmq-connector/rabbitmq-connector:latest
         imagePullPolicy: Always
         env:
         - name: basic_auth

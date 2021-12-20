@@ -14,8 +14,23 @@ spec:
   - host: OPENFAAS_API_URL
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - path: /system/functions
+        pathType: Exact
+        backend:
+          service:
+            name: gateway
+            port:
+              number: 8080
+      # ~mdc specifically allow public-facing functions (/function/.* wildcard for all)
+      - path: /function/notify
+        pathType: Exact
+        backend:
+          service:
+            name: gateway
+            port:
+              number: 8080
+      - path: /function/notify-test
+        pathType: Exact
         backend:
           service:
             name: gateway

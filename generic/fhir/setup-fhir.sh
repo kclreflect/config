@@ -13,3 +13,4 @@ sleep 3
 kubectl describe certificate fhir-tls --namespace $FHIR_NAMESPACE 
 kubectl describe secret fhir-tls --namespace $FHIR_NAMESPACE
 echo "=> INFO: CA cert is here if useful^"
+kubectl port-forward "service/hapi-fhir-jpaserver" 8080 --namespace $FHIR_NAMESPACE
