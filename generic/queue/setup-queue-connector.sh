@@ -1,4 +1,4 @@
-export $(cat .env | xargs)
+export $(cat ${1:-.env} | xargs)
 # ---------------------------------------------- #
 echo "=> setting up gitlab container registry keys..."
 sleep 5

@@ -2,7 +2,7 @@ export $(cat .env | xargs)
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 # ---------------------------------------------- #
-echo "=> installing cert manager..."
+echo "=> installing cert manager (may already be installed)..."
 helm install cert-manager --namespace cert-manager --create-namespace --set installCRDs=true --version v1.6 jetstack/cert-manager
 # ---------------------------------------------- #
 echo "=> generating service certificate and key (internal root CA)..."

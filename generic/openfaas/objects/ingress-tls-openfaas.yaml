@@ -29,10 +29,3 @@ spec:
             name: gateway
             port:
               number: 8080
-      - path: /function/notify-test
-        pathType: Exact
-        backend:
-          service:
-            name: gateway
-            port:
-              number: 8080

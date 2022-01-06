@@ -1,16 +1,19 @@
-export $(cat .env | xargs)
+export $(cat ${1:-.env} | xargs)
+kubectl config set-context --current --namespace=$FHIR_NAMESPACE
 # ---------------------------------------------- #
 echo "=> installing fhir server..."
-helm install --namespace $FHIR_NAMESPACE --create-namespace --render-subchart-notes hapi-fhir-jpaserver hapifhir/hapi-fhir-jpaserver
+helm install --create-namespace --render-subchart-notes hapi-fhir-jpaserver hapifhir/hapi-fhir-jpaserver
 # ---------------------------------------------- #
 echo "=> adding ingress resource for fhir server..."
-sed -e 's|INTERNAL_API_URL|'"${INTERNAL_API_URL}"'|g' ./objects/ingress-tls-fhir.yaml | kubectl create -f - --namespace $FHIR_NAMESPACE 
+sed -e 's|INTERNAL_API_URL|'"${INTERNAL_API_URL}"'|g' ./objects/ingress-tls-fhir.yaml | kubectl create -f -
 # ---------------------------------------------- #
 echo "=> waiting for certificates to generate (might take longer than this wait)..."
 sleep 30
-kubectl get certificate --namespace $FHIR_NAMESPACE
+kubectl get certificate
 sleep 3
-kubectl describe certificate fhir-tls --namespace $FHIR_NAMESPACE 
-kubectl describe secret fhir-tls --namespace $FHIR_NAMESPACE
+kubectl describe certificate fhir-tls
+kubectl describe secret fhir-tls
 echo "=> INFO: CA cert is here if useful^"
+kubectl config set-context --current --namespace=default
+sleep 10
 kubectl port-forward "service/hapi-fhir-jpaserver" 8080 --namespace $FHIR_NAMESPACE
