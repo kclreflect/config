@@ -29,3 +29,10 @@ spec:
             name: gateway
             port:
               number: 8080
+      - path: /function/simulate
+        pathType: Exact
+        backend:
+          service:
+            name: gateway
+            port:
+              number: 8080

@@ -32,8 +32,5 @@ kubectl delete rolebinding mongodb-kubernetes-operator
 kubectl delete role mongodb-database 
 kubectl delete serviceaccount mongodb-database 
 kubectl delete rolebinding mongodb-database 
-# ---------------------------------------------- #
-echo "=> deleting namespace..."
 kubectl config set-context --current --namespace=default
-kubectl delete namespace $DB_NAMESPACE
 

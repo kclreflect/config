@@ -1,3 +1,5 @@
+* setup
+
 to set up production cluster for this project, add appropriate .env files and run:
 
 aws/setup-cluster-0-init
