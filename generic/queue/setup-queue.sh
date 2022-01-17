@@ -34,4 +34,4 @@ sleep 30
 echo "=> username: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.username}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
 echo "=> password: "$(kubectl get secret ${QUEUE_CLUSTER_NAME}-default-user -o jsonpath='{.data.password}' --namespace ${QUEUE_NAMESPACE} | base64 --decode)
 echo "=> connect with: 'kubectl port-forward "service/${QUEUE_CLUSTER_NAME}" 15671 --namespace ${QUEUE_NAMESPACE}'"
-echo "=> WARN: setup credentials if using queue connector"
+echo "=> WARN: setup credentials if using queue connector, and copy credentials to appropriate applications"

@@ -30,6 +30,7 @@ sed -e 's|USERNAME|'"${USERNAME}"'|g' ./objects/mongodb.yaml | sed -e 's|MONGO_P
 sleep 5
 # ---------------------------------------------- #
 kubectl logs deployment/mongodb-kubernetes-operator
+echo "=> WARN: copy db credentials to appropriate applications:"
 echo $USERNAME
 echo $PASSWORD
 kubectl config set-context --current --namespace=default
