@@ -8,9 +8,14 @@ kubectl delete secret fhir-tls
 echo "=> deleting ingress resource for fhir server..."
 kubectl delete ingress fhir
 # ---------------------------------------------- #
+echo "=> removing fhir server storage..."
+kubectl delete statefulset hapi-fhir-jpaserver-postgresql
+kubectl delete pvc data-hapi-fhir-jpaserver-postgresql-0
+# ---------------------------------------------- #
+echo "=> deleting deployment for fhir server..."
+kubectl delete deploy hapi-fhir-jpaserver
+# ---------------------------------------------- #
 echo "=> deleting fhir server..."
 helm uninstall hapi-fhir-jpaserver
 # ---------------------------------------------- #
-echo "=> removing fhir server storage..."
-kubectl delete pvc data-hapi-fhir-jpaserver-postgresql-0
 kubectl config set-context --current --namespace=default

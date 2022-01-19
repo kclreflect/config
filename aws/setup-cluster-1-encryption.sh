@@ -27,6 +27,8 @@ kops replace --state s3://$STATE_BUCKET_NAME -f cluster-desired-config.yaml
 # ---------------------------------------------- #
 echo "=> running cluster updates..."
 kops update cluster --yes --state s3://$STATE_BUCKET_NAME
+read -n 1 -s -r -p "=> WARN: rolling update requires connection to api server. request forwarding in place? any key to continue. manually exit if not"
+echo
 kops rolling-update cluster --yes --state s3://$STATE_BUCKET_NAME
 rm cluster-desired-config.yaml
 # ---------------------------------------------- #
