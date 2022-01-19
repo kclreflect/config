@@ -5,7 +5,7 @@ helm repo update
 echo "=> about to install openfaas..."
 sleep 5
 kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
-helm upgrade openfaas --install openfaas/openfaas --namespace openfaas --set functionNamespace=openfaas-fn --set generateBasicAuth=true --set serviceType=ClusterIP # no direct external connection
+helm upgrade openfaas --install openfaas/openfaas --namespace openfaas --set functionNamespace=openfaas-fn --set generateBasicAuth=true --set gateway.replicas=5 --set serviceType=ClusterIP # no direct external connection
 PASSWORD=$(kubectl -n openfaas get secret basic-auth -o jsonpath="{.data.basic-auth-password}" | base64 --decode) 
 echo "=> openFaaS admin password: $PASSWORD"
 # ---------------------------------------------- #
